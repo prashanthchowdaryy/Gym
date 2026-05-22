@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Iron Pulse – Member Portal</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --red:#e8192c;--red-dark:#b51020;--red-glow:rgba(232,25,44,0.2);
+  --black:#0a0a0a;--dark:#111;--dark-2:#181818;--dark-3:#222;--dark-4:#2a2a2a;
+  --gray-1:#888;--gray-2:#555;--gray-3:#aaa;--white:#fff;
+  --green:#20c864;--yellow:#ffc832;--blue:#3282ff;
+  --font-d:'Bebas Neue',sans-serif;--font-c:'Barlow Condensed',sans-serif;--font-b:'Barlow',sans-serif;
+  --nav-h:64px;--bot-h:64px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:15px;scroll-behavior:smooth;}
+body{background:var(--black);color:var(--white);font-family:var(--font-b);min-height:100vh;}
+
+/* ════════════ LOGIN ════════════ */
+#login-screen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:var(--black);position:relative;overflow:hidden;
+}
+#login-screen::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(232,25,44,0.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.login-wrap{width:100%;max-width:420px;padding:1.5rem;}
+.login-box{
+  background:rgba(24,24,24,0.97);border:1px solid var(--dark-4);padding:2.5rem 2rem;
+  border-radius:8px;box-shadow:0 0 80px rgba(0,0,0,0.8);position:relative;
+}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--red),transparent);border-radius:8px 8px 0 0;}
+.login-logo{font-family:var(--font-d);font-size:2.4rem;letter-spacing:0.1em;text-align:center;line-height:1;}
+.login-logo span{color:var(--red);}
+.login-sub{text-align:center;font-family:var(--font-c);font-size:0.7rem;letter-spacing:0.25em;color:var(--gray-1);text-transform:uppercase;margin:0.4rem 0 2rem;}
+.login-field{margin-bottom:1.2rem;}
+.login-field label{display:block;font-family:var(--font-c);font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray-3);margin-bottom:0.4rem;}
+.login-field input{width:100%;background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.85rem 1rem;font-family:var(--font-b);font-size:1rem;border-radius:4px;outline:none;transition:border-color 0.2s;}
+.login-field input:focus{border-color:var(--red);}
+.login-err{background:rgba(232,25,44,0.1);border:1px solid rgba(232,25,44,0.3);color:var(--red);padding:0.6rem 0.8rem;border-radius:4px;font-size:0.82rem;margin-bottom:1rem;display:none;}
+.btn-login{width:100%;background:var(--red);color:var(--white);border:none;padding:1rem;font-family:var(--font-c);font-size:0.95rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.5rem;-webkit-tap-highlight-color:transparent;}
+.btn-login:hover{background:var(--red-dark);box-shadow:0 4px 24px var(--red-glow);}
+.back-link{text-align:center;margin-top:1.2rem;font-size:0.8rem;color:var(--gray-2);}
+.back-link a{color:var(--red);text-decoration:none;}
+.demo-hint{text-align:center;margin-top:0.8rem;font-size:0.74rem;color:var(--gray-2);}
+.demo-hint span{color:var(--red);}
+
+/* ════════════ PORTAL SHELL ════════════ */
+#portal{display:none;}
+
+/* Top nav */
+.portal-nav{
+  background:rgba(17,17,17,0.98);border-bottom:1px solid var(--dark-3);
+  padding:0 1.5rem;height:var(--nav-h);display:flex;align-items:center;
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);
+}
+.portal-logo{font-family:var(--font-d);font-size:1.3rem;letter-spacing:0.1em;}
+.portal-logo span{color:var(--red);}
+.portal-nav-right{margin-left:auto;display:flex;align-items:center;gap:0.75rem;}
+.member-chip{display:flex;align-items:center;gap:0.5rem;font-size:0.84rem;}
+.member-chip-av{width:32px;height:32px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:0.9rem;flex-shrink:0;}
+.logout-btn{background:none;border:1px solid var(--dark-4);color:var(--gray-3);padding:0.35rem 0.75rem;font-family:var(--font-c);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;-webkit-tap-highlight-color:transparent;}
+.logout-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* ════════════ PORTAL BODY ════════════ */
+.portal-body{max-width:1100px;margin:0 auto;padding:1.5rem;}
+
+/* Sections — all visible by default, JS controls on mobile */
+.ps{display:block;}
+
+/* ── HERO CARD ── */
+.hero-card{
+  background:linear-gradient(135deg,var(--dark-2) 0%,rgba(232,25,44,0.06) 100%);
+  border:1px solid var(--dark-3);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem;
+  display:flex;align-items:center;gap:1.5rem;position:relative;overflow:hidden;
+}
+.hero-card::before{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(232,25,44,0.04);pointer-events:none;}
+.hero-av{width:64px;height:64px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:1.8rem;flex-shrink:0;border:3px solid rgba(232,25,44,0.4);}
+.hero-info h1{font-family:var(--font-d);font-size:1.8rem;letter-spacing:0.06em;line-height:1;}
+.hero-info p{font-size:0.82rem;color:var(--gray-3);margin-top:0.3rem;}
+.hero-badges{display:flex;gap:0.5rem;margin-top:0.5rem;flex-wrap:wrap;}
+.hbadge{display:inline-flex;align-items:center;gap:0.4rem;padding:0.2rem 0.6rem;border-radius:2px;font-family:var(--font-c);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;}
+.hbadge-red{background:rgba(232,25,44,0.12);color:var(--red);border:1px solid rgba(232,25,44,0.25);}
+.hbadge-green{background:rgba(32,200,100,0.1);color:var(--green);border:1px solid rgba(32,200,100,0.25);}
+.hbadge-blue{background:rgba(50,130,255,0.1);color:var(--blue);border:1px solid rgba(50,130,255,0.25);}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0.8rem;margin-bottom:1.5rem;}
+.stat-box{background:var(--dark-2);border:1px solid var(--dark-3);border-radius:6px;padding:1rem;text-align:center;transition:border-color 0.2s;}
+.stat-box:hover{border-color:rgba(232,25,44,0.4);}
+.stat-box-val{font-family:var(--font-d);font-size:1.6rem;color:var(--red);}
+.stat-box-lbl{font-family:var(--font-c);font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-1);margin-top:0.1rem;}
+
+/* ── SECTION HEADINGS ── */
+.sec{margin-bottom:1.5rem;}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.85rem;}
+.sec-title{font-family:var(--font-c);font-size:0.78rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--red);display:flex;align-items:center;gap:0.5rem;}
+.card{background:var(--dark-2);border:1px solid var(--dark-3);border-radius:6px;overflow:hidden;}
+.card-pad{padding:1.2rem;}
+
+/* ── WEEK GRID ── */
+.week-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.7rem;}
+.day-card{background:var(--dark-3);border-radius:6px;padding:0.9rem;text-align:center;border:1px solid transparent;transition:all 0.2s;}
+.day-card.today{border-color:var(--red);background:rgba(232,25,44,0.06);}
+.day-card.rest{opacity:0.5;}
+.day-name{font-family:var(--font-d);font-size:1.3rem;letter-spacing:0.06em;line-height:1;}
+.day-card.today .day-name{color:var(--red);}
+.day-muscle{font-size:0.78rem;color:var(--gray-3);margin-top:0.25rem;line-height:1.3;}
+.today-badge{display:inline-block;background:var(--red);color:var(--white);font-family:var(--font-c);font-size:0.52rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.1rem 0.4rem;border-radius:2px;margin-top:0.35rem;}
+
+/* ── EXERCISE TABLE ── */
+.ex-table{width:100%;}
+.ex-table thead th{padding:0.6rem 0.8rem;text-align:left;font-family:var(--font-c);font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray-1);background:var(--dark-3);}
+.ex-table tbody td{padding:0.65rem 0.8rem;font-size:0.84rem;border-bottom:1px solid var(--dark-3);}
+.ex-table tbody tr:last-child td{border-bottom:none;}
+.ex-num{font-family:var(--font-d);font-size:1.1rem;color:var(--red);min-width:28px;}
+.sets-badge{display:inline-block;background:rgba(232,25,44,0.12);color:var(--red);font-family:var(--font-c);font-size:0.7rem;font-weight:700;padding:0.12rem 0.42rem;border-radius:2px;}
+
+/* ── DIET ── */
+.macro-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0.7rem;margin-bottom:1rem;}
+.macro-box{background:var(--dark-3);border-radius:6px;padding:0.85rem;text-align:center;}
+.macro-val{font-family:var(--font-d);font-size:1.5rem;color:var(--white);}
+.macro-unit{font-size:0.7rem;color:var(--red);font-family:var(--font-c);font-weight:700;}
+.macro-lbl{font-family:var(--font-c);font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-1);margin-top:0.15rem;}
+.meal-item{padding:0.75rem 0;border-bottom:1px solid var(--dark-3);}
+.meal-item:last-child{border-bottom:none;}
+.meal-time{font-family:var(--font-c);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);margin-bottom:0.25rem;}
+.meal-text{font-size:0.84rem;line-height:1.5;}
+
+/* ── FEE ── */
+.fee-status-card{border-radius:6px;padding:1rem 1.2rem;display:flex;align-items:center;gap:0.9rem;margin-bottom:1rem;flex-wrap:wrap;}
+.fee-status-card.paid{background:rgba(32,200,100,0.06);border:1px solid rgba(32,200,100,0.2);}
+.fee-status-card.overdue{background:rgba(232,25,44,0.06);border:1px solid rgba(232,25,44,0.25);}
+.fee-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.fee-icon.paid{background:rgba(32,200,100,0.15);color:var(--green);}
+.fee-icon.overdue{background:rgba(232,25,44,0.15);color:var(--red);}
+.fee-info-title{font-size:0.92rem;font-weight:700;}
+.fee-info-sub{font-size:0.75rem;color:var(--gray-3);margin-top:0.15rem;}
+.pay-tl{position:relative;padding-left:1.5rem;}
+.pay-tl::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--dark-4);}
+.pay-tl-item{position:relative;margin-bottom:1rem;}
+.pay-dot{width:12px;height:12px;border-radius:50%;position:absolute;left:-1.5rem;top:4px;background:var(--red);border:2px solid var(--red);}
+.pay-tl-date{font-family:var(--font-c);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-1);}
+.pay-tl-info{font-size:0.84rem;margin-top:0.12rem;}
+.pay-tl-amount{color:var(--red);font-family:var(--font-c);font-weight:700;}
+
+/* ── PROGRESS ── */
+.progress-bar-wrap{background:var(--dark-3);border-radius:10px;height:8px;overflow:hidden;margin:0.3rem 0 0.6rem;}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--red-dark),var(--red));border-radius:10px;transition:width 1s ease;}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:5rem;right:1rem;left:1rem;background:var(--dark-3);border:1px solid var(--red);color:var(--white);padding:0.8rem 1.2rem;border-radius:6px;font-size:0.85rem;z-index:9999;transform:translateY(60px);opacity:0;transition:all 0.3s;pointer-events:none;text-align:center;}
+#toast.show{transform:translateY(0);opacity:1;}
+
+/* ════════════ BOTTOM NAV — hidden until logged in ════════════ */
+#mob-nav{
+  display:none; /* hidden always by default; shown by JS after login on mobile */
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--bot-h);
+  background:rgba(10,10,10,0.97);
+  border-top:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  z-index:200;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  box-shadow:0 -4px 24px rgba(0,0,0,0.5);
+}
+#mob-nav.visible{display:flex;}
+.mni{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;cursor:pointer;color:#666;
+  font-family:var(--font-c);font-size:0.55rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+  border:none;background:none;padding:6px 2px;position:relative;
+  transition:color 0.18s;-webkit-tap-highlight-color:transparent;
+}
+.mni i{font-size:1.15rem;display:block;transition:transform 0.18s,color 0.18s;}
+.mni.active{color:var(--white);}
+.mni.active i{color:var(--red);transform:translateY(-1px);}
+.mni::before{content:'';position:absolute;top:0;left:22%;right:22%;height:2px;background:var(--red);border-radius:0 0 3px 3px;opacity:0;transition:opacity 0.18s;}
+.mni.active::before{opacity:1;}
+
+/* ════════════ RESPONSIVE ════════════ */
+@media(max-width:768px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .macro-row{grid-template-columns:1fr 1fr;}
+  .hero-card{flex-direction:column;text-align:center;gap:1rem;}
+  .hero-av{align-self:center;}
+  .hero-badges{justify-content:center;}
+  .portal-nav{padding:0 1rem;}
+  .portal-body{padding:1rem;padding-bottom:calc(var(--bot-h) + 8px);}
+  #main-grid{grid-template-columns:1fr!important;}
+  .week-grid{grid-template-columns:repeat(4,1fr);}
+  .member-chip .member-name{display:none;}
+}
+@media(max-width:420px){
+  .week-grid{grid-template-columns:repeat(2,1fr);}
+  .hero-info h1{font-size:1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="login-logo">IRON <span>PULSE</span></div>
+      <div class="login-sub">Member Portal</div>
+      <div class="login-err" id="login-err"><i class="fa-solid fa-circle-exclamation"></i> <span id="login-err-msg">Invalid User ID or password.</span></div>
+      <div class="login-field"><label>Member User ID</label><input type="text" id="l-uid" placeholder="e.g. IPF001" autocomplete="username"/></div>
+      <div class="login-field"><label>Password</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <button class="btn-login" onclick="doLogin()"><i class="fa-solid fa-right-to-bracket"></i> Login to My Portal</button>
+      <p class="demo-hint">Demo: User ID <span>IPF001</span> / Password <span>aakash@001</span></p>
+      <p class="back-link"><a href="admin-panel.html">← Admin Panel</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PORTAL ═══ -->
+<div id="portal">
+  <nav class="portal-nav">
+    <div class="portal-logo">IRON <span>PULSE</span></div>
+    <div class="portal-nav-right">
+      <div class="member-chip">
+        <div class="member-chip-av" id="nav-av">?</div>
+        <span class="member-name" id="nav-name">Member</span>
+      </div>
+      <button class="logout-btn" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+  </nav>
+
+  <div class="portal-body">
+
+    <!-- HOME: hero + stats + workout + diet -->
+    <div class="ps" id="ps-home">
+
+      <div class="hero-card" id="hero-card"></div>
+      <div class="stats-row" id="stats-row"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.5rem;" id="main-grid">
+        <div class="sec">
+          <div class="sec-hd"><div class="sec-title"><i class="fa-solid fa-dumbbell"></i> Today's Workout</div></div>
+          <div class="card" id="today-workout-card"></div>
+        </div>
+        <div class="sec">
+          <div class="sec-hd"><div class="sec-title"><i class="fa-solid fa-bowl-food"></i> My Diet Plan</div></div>
+          <div class="card" id="diet-card"></div>
+        </div>
+      </div>
+
+    </div><!-- /ps-home -->
+
+    <!-- WORKOUTS: full week schedule -->
+    <div class="ps" id="ps-workout">
+      <div class="sec">
+        <div class="sec-hd"><div class="sec-title"><i class="fa-solid fa-calendar-week"></i> Weekly Schedule</div></div>
+        <div class="card card-pad">
+          <div class="week-grid" id="week-grid"></div>
+        </div>
+      </div>
+    </div><!-- /ps-workout -->
+
+    <!-- DIET: full diet detail -->
+    <div class="ps" id="ps-diet">
+      <div class="sec">
+        <div class="sec-hd"><div class="sec-title"><i class="fa-solid fa-bowl-food"></i> Full Diet Plan</div></div>
+        <div class="card" id="diet-full-card"></div>
+      </div>
+    </div><!-- /ps-diet -->
+
+    <!-- FEES -->
+    <div class="ps" id="ps-fees">
+      <div class="sec">
+        <div class="sec-hd"><div class="sec-title"><i class="fa-solid fa-indian-rupee-sign"></i> Fee & Payment</div></div>
+        <div class="card card-pad" id="fee-card"></div>
+      </div>
+    </div><!-- /ps-fees -->
+
+    <!-- PROFILE -->
+    <div class="ps" id="ps-profile">
+      <div class="sec">
+        <div class="sec-hd"><div class="sec-title"><i class="fa-solid fa-id-card"></i> My Profile</div></div>
+        <div class="card card-pad" id="profile-card"></div>
+      </div>
+    </div><!-- /ps-profile -->
+
+  </div><!-- /portal-body -->
+</div><!-- /portal -->
+
+<!-- ═══ MOBILE BOTTOM NAV — only shown after login on mobile ═══ -->
+<nav id="mob-nav">
+  <button class="mni active" id="mni-home" onclick="showTab('home')">
+    <i class="fa-solid fa-house"></i>
+    <span>Home</span>
+  </button>
+  <button class="mni" id="mni-workout" onclick="showTab('workout')">
+    <i class="fa-solid fa-dumbbell"></i>
+    <span>Workouts</span>
+  </button>
+  <button class="mni" id="mni-diet" onclick="showTab('diet')">
+    <i class="fa-solid fa-bowl-food"></i>
+    <span>Diet</span>
+  </button>
+  <button class="mni" id="mni-fees" onclick="showTab('fees')">
+    <i class="fa-solid fa-indian-rupee-sign"></i>
+    <span>Fees</span>
+  </button>
+  <button class="mni" id="mni-profile" onclick="showTab('profile')">
+    <i class="fa-solid fa-id-card"></i>
+    <span>Profile</span>
+  </button>
+</nav>
+
+<div id="toast"></div>
+
+<script>
+// ════════════ DATA ════════════
+function load(k){try{return JSON.parse(localStorage.getItem(k))||null;}catch{return null;}}
+
+const defaultMembers=[
+  {id:'IPF001',name:'Aakash Mehta',phone:'9876543210',email:'aakash@gmail.com',dob:'1995-04-15',plan:'Standard – ₹1499/month',joindate:'2025-01-10',goal:'Muscle Gain',trainer:'Kiran Reddy',health:'None',fee:1499,feepaid:'2025-05-01',feedue:'2025-06-01',password:'aakash@001',active:true},
+  {id:'IPF002',name:'Sneha Rao',phone:'9988776655',email:'sneha@gmail.com',dob:'1998-07-22',plan:'Elite – ₹2499/month',joindate:'2025-02-15',goal:'Fat Loss',trainer:'Priya Menon',health:'None',fee:2499,feepaid:'2025-05-10',feedue:'2025-06-10',password:'sneha@002',active:true},
+  {id:'IPF003',name:'Vikram Nair',phone:'9123456789',email:'vikram@gmail.com',dob:'1992-11-30',plan:'Basic – ₹999/month',joindate:'2025-03-01',goal:'General Fitness',trainer:'Arjun Singh',health:'Mild BP',fee:999,feepaid:'2025-04-15',feedue:'2025-05-15',password:'vikram@003',active:true},
+];
+const defaultWorkouts={
+  'IPF001':{days:5,schedule:{Mon:'Chest & Triceps',Tue:'Back & Biceps',Wed:'Legs',Thu:'Shoulders',Fri:'Core & Cardio'},updated:'2025-05-01'},
+  'IPF002':{days:4,schedule:{Mon:'Full Body HIIT',Wed:'Cardio + Core',Fri:'Strength Circuit',Sat:'Yoga & Stretch'},updated:'2025-05-05'},
+  'IPF003':{days:3,schedule:{Mon:'Full Body A',Wed:'Full Body B',Fri:'Cardio'},updated:'2025-04-28'},
+};
+const defaultDiets={
+  'IPF001':{type:'High Protein',calories:2800,protein:200,carbs:280,fat:70,notes:'Breakfast: 5 eggs + oats + milk\nLunch: 200g chicken breast + brown rice + salad\nPre-Workout: Banana + Whey Protein\nDinner: 150g paneer + roti + salad\nSnacks: Almonds + Greek yogurt'},
+  'IPF002':{type:'Calorie Deficit',calories:1600,protein:130,carbs:150,fat:45,notes:'Breakfast: Egg white omelette (4 eggs) + 1 toast\nLunch: Tuna/chicken salad + cucumber\nPre-Workout: Black coffee\nDinner: Grilled veg + 1 cup dal + 1 roti\nSnacks: Almonds (10) + green tea'},
+  'IPF003':{type:'Balanced',calories:2000,protein:120,carbs:220,fat:60,notes:'Breakfast: Idli/Dosa + sambar\nLunch: Rice + dal + sabzi + curd\nDinner: Chapati + curry + salad\nSnacks: Fruits or nuts'},
+};
+const exDB={
+  'Chest & Triceps':[{name:'Bench Press',sets:'4 x 10',rest:'90s'},{name:'Incline Dumbbell Press',sets:'3 x 12',rest:'60s'},{name:'Cable Crossover',sets:'3 x 15',rest:'60s'},{name:'Tricep Pushdown',sets:'3 x 12',rest:'60s'},{name:'Skull Crushers',sets:'3 x 10',rest:'60s'}],
+  'Back & Biceps':[{name:'Deadlift',sets:'4 x 8',rest:'2min'},{name:'Lat Pulldown',sets:'3 x 12',rest:'60s'},{name:'Seated Cable Row',sets:'3 x 12',rest:'60s'},{name:'Barbell Curl',sets:'3 x 10',rest:'60s'},{name:'Hammer Curl',sets:'3 x 12',rest:'45s'}],
+  'Legs':[{name:'Squat',sets:'4 x 10',rest:'2min'},{name:'Leg Press',sets:'3 x 12',rest:'90s'},{name:'Romanian Deadlift',sets:'3 x 10',rest:'90s'},{name:'Leg Extension',sets:'3 x 15',rest:'60s'},{name:'Calf Raise',sets:'4 x 20',rest:'45s'}],
+  'Shoulders':[{name:'Overhead Press',sets:'4 x 10',rest:'90s'},{name:'Lateral Raise',sets:'3 x 15',rest:'45s'},{name:'Front Raise',sets:'3 x 12',rest:'45s'},{name:'Face Pull',sets:'3 x 15',rest:'45s'},{name:'Arnold Press',sets:'3 x 10',rest:'60s'}],
+  'Core & Cardio':[{name:'Plank',sets:'3 x 60s',rest:'30s'},{name:'Crunches',sets:'3 x 25',rest:'30s'},{name:'Leg Raise',sets:'3 x 15',rest:'30s'},{name:'Treadmill',sets:'1 x 20min',rest:'—'},{name:'Cycling',sets:'1 x 15min',rest:'—'}],
+  'Full Body HIIT':[{name:'Burpees',sets:'4 x 12',rest:'30s'},{name:'Jump Squats',sets:'3 x 15',rest:'30s'},{name:'Mountain Climbers',sets:'3 x 30',rest:'20s'},{name:'Box Jump',sets:'3 x 10',rest:'45s'},{name:'Battle Ropes',sets:'3 x 30s',rest:'30s'}],
+  'Cardio + Core':[{name:'Treadmill Run',sets:'1 x 20min',rest:'—'},{name:'Plank Variations',sets:'3 x 45s',rest:'20s'},{name:'Russian Twist',sets:'3 x 20',rest:'30s'},{name:'Bicycle Crunch',sets:'3 x 20',rest:'30s'}],
+  'Strength Circuit':[{name:'Deadlift',sets:'5 x 5',rest:'3min'},{name:'Bench Press',sets:'5 x 5',rest:'3min'},{name:'Squat',sets:'5 x 5',rest:'3min'},{name:'Overhead Press',sets:'3 x 8',rest:'2min'}],
+  'Yoga & Stretch':[{name:'Sun Salutation',sets:'3 x 5',rest:'30s'},{name:'Pigeon Pose',sets:'3 x 60s',rest:'—'},{name:"Child's Pose",sets:'2 x 60s',rest:'—'},{name:'Foam Rolling',sets:'1 x 10min',rest:'—'}],
+  'Full Body A':[{name:'Squat',sets:'3 x 10',rest:'90s'},{name:'Bench Press',sets:'3 x 10',rest:'90s'},{name:'Barbell Row',sets:'3 x 10',rest:'90s'},{name:'Overhead Press',sets:'3 x 10',rest:'90s'}],
+  'Full Body B':[{name:'Deadlift',sets:'3 x 8',rest:'2min'},{name:'Incline Press',sets:'3 x 10',rest:'90s'},{name:'Pull-up / Lat Pulldown',sets:'3 x 8',rest:'90s'},{name:'Dumbbell Curl',sets:'3 x 12',rest:'60s'}],
+  'Cardio':[{name:'Treadmill',sets:'1 x 30min',rest:'—'},{name:'Cycling',sets:'1 x 15min',rest:'—'},{name:'Jump Rope',sets:'3 x 3min',rest:'1min'}],
+};
+
+function getMembers(){return load('ip_members')||defaultMembers;}
+function getWorkouts(){return load('ip_workouts')||defaultWorkouts;}
+function getDiets(){return load('ip_diets')||defaultDiets;}
+function getFees(){return load('ip_fees')||[];}
+
+// ════════════ AUTH ════════════
+let currentMember=null;
+
+function doLogin(){
+  const uid=document.getElementById('l-uid').value.trim().toUpperCase();
+  const pass=document.getElementById('l-pass').value.trim();
+  const members=getMembers();
+  const m=members.find(x=>x.id.toUpperCase()===uid && x.password===pass);
+  const errEl=document.getElementById('login-err');
+  const errMsg=document.getElementById('login-err-msg');
+  if(!m){
+    errMsg.textContent='Invalid User ID or password.';
+    errEl.style.display='block';
+    setTimeout(()=>errEl.style.display='none',3500);
+    return;
+  }
+  if(!m.active){
+    errMsg.textContent='Your membership is inactive. Contact admin.';
+    errEl.style.display='block';
+    return;
+  }
+  currentMember=m;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('portal').style.display='block';
+  // Show bottom nav only on mobile
+  if(window.innerWidth<=768){
+    document.getElementById('mob-nav').classList.add('visible');
+    // On mobile start at home tab
+    showTab('home');
+  } else {
+    // Desktop: all sections visible
+    document.querySelectorAll('.ps').forEach(s=>s.style.display='block');
+    adjustGrid();
+  }
+  renderPortal();
+}
+
+function doLogout(){
+  currentMember=null;
+  document.getElementById('portal').style.display='none';
+  document.getElementById('mob-nav').classList.remove('visible');
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('l-uid').value='';
+  document.getElementById('l-pass').value='';
+}
+
+// ════════════ TAB SWITCHING (mobile only) ════════════
+let currentTab='home';
+function showTab(tab){
+  currentTab=tab;
+  // Hide all sections
+  document.querySelectorAll('.ps').forEach(s=>s.style.display='none');
+  // Show selected
+  const el=document.getElementById('ps-'+tab);
+  if(el) el.style.display='block';
+  // Update nav buttons
+  document.querySelectorAll('.mni').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('mni-'+tab);
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ════════════ RENDER ════════════
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function todayKey(){return DAYS[new Date().getDay()];}
+function initials(n){return n.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();}
+function fmtDate(d){if(!d)return '—';return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}
+function daysSince(d){return Math.floor((new Date()-new Date(d))/86400000);}
+
+function renderPortal(){
+  const m=currentMember;
+  const w=getWorkouts()[m.id];
+  const d=getDiets()[m.id];
+  const fees=getFees().filter(f=>f.memberId===m.id);
+  const todayDay=todayKey();
+  const overdue=new Date(m.feedue)<new Date();
+
+  // Nav
+  document.getElementById('nav-av').textContent=initials(m.name);
+  document.getElementById('nav-name').textContent=m.name.split(' ')[0];
+
+  // Hero
+  const joined=daysSince(m.joindate);
+  document.getElementById('hero-card').innerHTML=`
+    <div class="hero-av">${initials(m.name)}</div>
+    <div class="hero-info">
+      <h1>${m.name}</h1>
+      <p>${m.id} &nbsp;·&nbsp; ${m.trainer}</p>
+      <div class="hero-badges">
+        <span class="hbadge hbadge-red"><i class="fa-solid fa-medal"></i>${m.plan.split('–')[0].trim()}</span>
+        <span class="hbadge hbadge-green"><i class="fa-solid fa-circle-check"></i>Active</span>
+        <span class="hbadge hbadge-blue"><i class="fa-solid fa-bullseye"></i>${m.goal}</span>
+      </div>
+    </div>
+  `;
+
+  // Stats
+  const daysLeft=Math.max(0,Math.ceil((new Date(m.feedue)-new Date())/86400000));
+  document.getElementById('stats-row').innerHTML=`
+    <div class="stat-box"><div class="stat-box-val">${joined}</div><div class="stat-box-lbl">Days Active</div></div>
+    <div class="stat-box"><div class="stat-box-val">${w?w.days:'—'}</div><div class="stat-box-lbl">Days/Week</div></div>
+    <div class="stat-box"><div class="stat-box-val" style="color:${overdue?'var(--red)':'var(--green)'}">${daysLeft}</div><div class="stat-box-lbl">Days to Due</div></div>
+    <div class="stat-box"><div class="stat-box-val">₹${m.fee}</div><div class="stat-box-lbl">Monthly Fee</div></div>
+  `;
+
+  // Today's workout
+  const todayEx=w&&w.schedule[todayDay];
+  const exercises=todayEx?exDB[todayEx]:null;
+  document.getElementById('today-workout-card').innerHTML=todayEx?`
+    <div style="background:var(--dark-3);padding:0.8rem 1rem;border-bottom:1px solid var(--dark-4);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:var(--font-d);font-size:1.1rem;letter-spacing:0.06em;">${todayEx}</div>
+        <div style="font-size:0.72rem;color:var(--gray-3);">${todayDay} — Today</div>
+      </div>
+      <span style="background:var(--red);color:#fff;font-family:var(--font-c);font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.22rem 0.5rem;border-radius:2px;">TODAY</span>
+    </div>
+    <div style="overflow-x:auto;">
+    <table class="ex-table">
+      <thead><tr><th>#</th><th>Exercise</th><th>Sets</th><th>Rest</th></tr></thead>
+      <tbody>
+        ${exercises?exercises.map((e,i)=>`<tr><td><span class="ex-num">${String(i+1).padStart(2,'0')}</span></td><td><b>${e.name}</b></td><td><span class="sets-badge">${e.sets}</span></td><td style="color:var(--gray-3);font-size:0.78rem;">${e.rest}</td></tr>`).join(''):'<tr><td colspan="4" style="color:var(--gray-2);text-align:center;padding:1rem;">Enjoy your rest day!</td></tr>'}
+      </tbody>
+    </table>
+    </div>
+  `:`<div style="padding:2rem;text-align:center;color:var(--gray-2);"><i class="fa-solid fa-moon" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>Rest Day<br><small>No workout for ${todayDay}</small></div>`;
+
+  // Diet card (summary for home)
+  const dietSummary=d?`
+    <div style="background:var(--dark-3);padding:0.8rem 1rem;border-bottom:1px solid var(--dark-4);font-family:var(--font-c);font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);">${d.type} Plan</div>
+    <div style="padding:1rem;">
+      <div class="macro-row">
+        <div class="macro-box"><div class="macro-val">${d.calories}<span class="macro-unit"> kcal</span></div><div class="macro-lbl">Cal</div></div>
+        <div class="macro-box"><div class="macro-val">${d.protein}<span class="macro-unit"> g</span></div><div class="macro-lbl">Protein</div></div>
+        <div class="macro-box"><div class="macro-val">${d.carbs}<span class="macro-unit"> g</span></div><div class="macro-lbl">Carbs</div></div>
+        <div class="macro-box"><div class="macro-val">${d.fat}<span class="macro-unit"> g</span></div><div class="macro-lbl">Fat</div></div>
+      </div>
+    </div>
+  `:'<div style="padding:2rem;text-align:center;color:var(--gray-2);">No diet plan assigned yet.</div>';
+  document.getElementById('diet-card').innerHTML=dietSummary;
+
+  // Diet full (for diet tab)
+  document.getElementById('diet-full-card').innerHTML=d?`
+    <div style="background:var(--dark-3);padding:0.8rem 1rem;border-bottom:1px solid var(--dark-4);font-family:var(--font-c);font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);">${d.type} Plan</div>
+    <div style="padding:1rem;">
+      <div class="macro-row">
+        <div class="macro-box"><div class="macro-val">${d.calories}<span class="macro-unit"> kcal</span></div><div class="macro-lbl">Calories</div></div>
+        <div class="macro-box"><div class="macro-val">${d.protein}<span class="macro-unit"> g</span></div><div class="macro-lbl">Protein</div></div>
+        <div class="macro-box"><div class="macro-val">${d.carbs}<span class="macro-unit"> g</span></div><div class="macro-lbl">Carbs</div></div>
+        <div class="macro-box"><div class="macro-val">${d.fat}<span class="macro-unit"> g</span></div><div class="macro-lbl">Fat</div></div>
+      </div>
+      <div style="font-family:var(--font-c);font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-1);margin-bottom:0.6rem;">Meal Plan</div>
+      ${d.notes.split('\n').filter(Boolean).map(line=>{const p=line.split(':');return`<div class="meal-item"><div class="meal-time">${p[0]||''}</div><div class="meal-text">${p.slice(1).join(':').trim()||line}</div></div>`;}).join('')}
+    </div>
+  `:'<div style="padding:2rem;text-align:center;color:var(--gray-2);">No diet plan assigned yet. Contact your trainer.</div>';
+
+  // Week grid
+  const allDays=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  document.getElementById('week-grid').innerHTML=allDays.map(day=>{
+    const ex=w&&w.schedule[day];
+    const isToday=day===todayDay;
+    return`<div class="day-card ${isToday?'today':''} ${!ex?'rest':''}">
+      <div class="day-name">${day}</div>
+      <div class="day-muscle">${ex||'Rest'}</div>
+      ${isToday?'<div class="today-badge">TODAY</div>':''}
+    </div>`;
+  }).join('');
+
+  // Fee
+  const allPayments=[{amount:m.fee,paiddate:m.feepaid,nextdue:m.feedue,mode:'Cash'},...fees].slice(0,4);
+  document.getElementById('fee-card').innerHTML=`
+    <div class="fee-status-card ${overdue?'overdue':'paid'}">
+      <div class="fee-icon ${overdue?'overdue':'paid'}"><i class="fa-solid fa-${overdue?'triangle-exclamation':'circle-check'}"></i></div>
+      <div style="flex:1;">
+        <div class="fee-info-title">${overdue?'Payment Overdue!':'Fee Up to Date ✓'}</div>
+        <div class="fee-info-sub">${overdue?`Due since ${fmtDate(m.feedue)}`:`Next due: ${fmtDate(m.feedue)}`}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:var(--font-d);font-size:1.7rem;color:var(--red);">₹${m.fee}</div>
+        <div style="font-size:0.68rem;color:var(--gray-1);">Monthly</div>
+      </div>
+    </div>
+    <div style="margin-top:0.8rem;">
+      <div style="font-family:var(--font-c);font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-1);margin-bottom:0.8rem;">Payment History</div>
+      <div class="pay-tl">
+        ${allPayments.map(p=>`
+          <div class="pay-tl-item">
+            <div class="pay-dot"></div>
+            <div class="pay-tl-date">${fmtDate(p.paiddate)}</div>
+            <div class="pay-tl-info">Paid <span class="pay-tl-amount">₹${p.amount}</span> via ${p.mode||'Cash'} · Next due: ${fmtDate(p.nextdue)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // Profile
+  document.getElementById('profile-card').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;">
+      ${[['Full Name',m.name],['Member ID',m.id,'var(--red)'],['Phone',m.phone],['Email',m.email||'—'],['Joined',fmtDate(m.joindate)],['Plan',m.plan.split('–')[0].trim()],['Trainer',m.trainer],['Goal',m.goal],['Health Notes',m.health&&m.health!=='None'?m.health:'—']].map(([label,val,col])=>`
+        <div>
+          <div style="font-family:var(--font-c);font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-1);">${label}</div>
+          <div style="font-size:0.88rem;font-weight:600;margin-top:0.2rem;${col?'color:'+col:''}">${val}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  toast('Welcome back, '+m.name.split(' ')[0]+'! 💪');
+}
+
+// ════════════ UTILS ════════════
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function adjustGrid(){
+  const g=document.getElementById('main-grid');
+  if(g) g.style.gridTemplateColumns=window.innerWidth<768?'1fr':'1fr 1fr';
+}
+
+// On resize: if going to desktop, show all sections & hide nav
+window.addEventListener('resize',()=>{
+  if(!currentMember) return;
+  if(window.innerWidth>768){
+    document.querySelectorAll('.ps').forEach(s=>s.style.display='block');
+    document.getElementById('mob-nav').classList.remove('visible');
+  } else {
+    document.getElementById('mob-nav').classList.add('visible');
+    showTab(currentTab);
+  }
+  adjustGrid();
+});
+
+adjustGrid();
+</script>
+</body>
+</html>

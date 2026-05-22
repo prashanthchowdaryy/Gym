@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Iron Pulse – Admin Panel</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --red:#e8192c;--red-dark:#b51020;--red-glow:rgba(232,25,44,0.25);
+  --black:#0a0a0a;--dark:#111;--dark-2:#181818;--dark-3:#222;--dark-4:#2a2a2a;
+  --gray-1:#888;--gray-2:#555;--gray-3:#aaa;--white:#fff;
+  --font-d:'Bebas Neue',sans-serif;--font-c:'Barlow Condensed',sans-serif;--font-b:'Barlow',sans-serif;
+  --sidebar:260px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:15px;}
+body{background:var(--black);color:var(--white);font-family:var(--font-b);display:flex;min-height:100vh;overflow-x:hidden;}
+
+/* ── LOGIN SCREEN ── */
+#login-screen{
+  position:fixed;inset:0;background:var(--black);z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+}
+.login-box{
+  background:var(--dark-2);border:1px solid var(--dark-4);padding:3rem 2.5rem;width:100%;max-width:420px;border-radius:4px;
+  box-shadow:0 0 60px rgba(0,0,0,0.7);
+}
+.login-logo{font-family:var(--font-d);font-size:2.2rem;letter-spacing:0.1em;text-align:center;margin-bottom:0.2rem;}
+.login-logo span{color:var(--red);}
+.login-sub{text-align:center;font-family:var(--font-c);font-size:0.72rem;letter-spacing:0.25em;color:var(--gray-1);text-transform:uppercase;margin-bottom:2rem;}
+.form-group{margin-bottom:1.2rem;}
+.form-group label{display:block;font-family:var(--font-c);font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-3);margin-bottom:0.5rem;}
+.form-group input{
+  width:100%;background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);
+  padding:0.75rem 1rem;font-family:var(--font-b);font-size:0.95rem;border-radius:2px;outline:none;
+  transition:border-color 0.2s;
+}
+.form-group input:focus{border-color:var(--red);}
+.login-err{color:var(--red);font-size:0.82rem;margin-bottom:0.8rem;display:none;}
+.btn-login{
+  width:100%;background:var(--red);color:var(--white);border:none;padding:0.85rem;
+  font-family:var(--font-c);font-size:0.9rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;
+  cursor:pointer;border-radius:2px;transition:background 0.2s,box-shadow 0.2s;
+}
+.btn-login:hover{background:var(--red-dark);box-shadow:0 4px 20px var(--red-glow);}
+.login-hint{text-align:center;margin-top:1rem;font-size:0.78rem;color:var(--gray-2);}
+.login-hint span{color:var(--red);}
+
+/* ── SIDEBAR ── */
+#sidebar{
+  width:var(--sidebar);background:var(--dark);border-right:1px solid var(--dark-3);
+  display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;
+}
+.sb-logo{padding:1.5rem 1.4rem;border-bottom:1px solid var(--dark-3);}
+.sb-logo h1{font-family:var(--font-d);font-size:1.4rem;letter-spacing:0.1em;}
+.sb-logo h1 span{color:var(--red);}
+.sb-logo small{font-family:var(--font-c);font-size:0.58rem;letter-spacing:0.25em;color:var(--gray-1);display:block;margin-top:2px;}
+.sb-admin{padding:1rem 1.4rem;border-bottom:1px solid var(--dark-3);display:flex;align-items:center;gap:0.8rem;}
+.sb-avatar{width:36px;height:36px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:1rem;flex-shrink:0;}
+.sb-admin-info{flex:1;min-width:0;}
+.sb-admin-name{font-size:0.85rem;font-weight:700;truncate:ellipsis;}
+.sb-admin-role{font-size:0.68rem;color:var(--red);font-family:var(--font-c);letter-spacing:0.1em;text-transform:uppercase;}
+.sb-nav{flex:1;padding:1rem 0;}
+.sb-section{font-family:var(--font-c);font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gray-2);padding:0.5rem 1.4rem;margin-top:0.5rem;}
+.sb-item{
+  display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1.4rem;
+  font-size:0.85rem;font-weight:600;color:var(--gray-3);cursor:pointer;transition:all 0.2s;
+  border-left:3px solid transparent;
+}
+.sb-item:hover{color:var(--white);background:var(--dark-2);}
+.sb-item.active{color:var(--white);background:rgba(232,25,44,0.08);border-left-color:var(--red);}
+.sb-item i{width:16px;text-align:center;color:var(--gray-2);font-size:0.85rem;}
+.sb-item.active i{color:var(--red);}
+.sb-logout{padding:1.2rem 1.4rem;border-top:1px solid var(--dark-3);}
+.sb-logout button{
+  width:100%;background:transparent;border:1px solid var(--dark-4);color:var(--gray-3);
+  padding:0.6rem;font-family:var(--font-c);font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;
+  cursor:pointer;border-radius:2px;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.5rem;
+}
+.sb-logout button:hover{border-color:var(--red);color:var(--red);}
+
+/* ── MAIN ── */
+#main{margin-left:var(--sidebar);flex:1;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{
+  background:var(--dark);border-bottom:1px solid var(--dark-3);padding:1rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;
+}
+.topbar-title{font-family:var(--font-d);font-size:1.6rem;letter-spacing:0.08em;}
+.topbar-actions{display:flex;gap:0.8rem;align-items:center;}
+.content{padding:2rem;flex:1;}
+
+/* ── CARDS ── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-bottom:2rem;}
+.stat-card{
+  background:var(--dark-2);border:1px solid var(--dark-3);border-radius:4px;padding:1.4rem 1.4rem;
+  display:flex;align-items:center;gap:1rem;transition:border-color 0.2s;
+}
+.stat-card:hover{border-color:var(--red);}
+.stat-icon{width:44px;height:44px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.stat-icon.red{background:rgba(232,25,44,0.12);color:var(--red);}
+.stat-icon.green{background:rgba(32,200,100,0.12);color:#20c864;}
+.stat-icon.blue{background:rgba(50,130,255,0.12);color:#3282ff;}
+.stat-icon.yellow{background:rgba(255,200,50,0.12);color:#ffc832;}
+.stat-val{font-family:var(--font-d);font-size:2rem;line-height:1;}
+.stat-lbl{font-size:0.72rem;color:var(--gray-1);font-family:var(--font-c);letter-spacing:0.1em;text-transform:uppercase;}
+
+/* ── PANEL SECTIONS ── */
+.page-section{display:none;}
+.page-section.active{display:block;}
+
+/* ── TABLE ── */
+.panel-card{background:var(--dark-2);border:1px solid var(--dark-3);border-radius:4px;overflow:hidden;margin-bottom:1.5rem;}
+.panel-card-header{
+  padding:1rem 1.4rem;border-bottom:1px solid var(--dark-3);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-card-title{font-family:var(--font-c);font-size:0.85rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;}
+table{width:100%;border-collapse:collapse;}
+thead th{
+  padding:0.7rem 1rem;text-align:left;font-family:var(--font-c);font-size:0.68rem;
+  letter-spacing:0.14em;text-transform:uppercase;color:var(--gray-1);background:var(--dark-3);
+  white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--dark-3);transition:background 0.15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,0.02);}
+td{padding:0.75rem 1rem;font-size:0.87rem;vertical-align:middle;}
+.badge{
+  display:inline-block;padding:0.18rem 0.55rem;border-radius:2px;font-family:var(--font-c);
+  font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;
+}
+.badge-green{background:rgba(32,200,100,0.15);color:#20c864;}
+.badge-red{background:rgba(232,25,44,0.15);color:var(--red);}
+.badge-yellow{background:rgba(255,200,50,0.15);color:#ffc832;}
+.badge-gray{background:rgba(100,100,100,0.2);color:var(--gray-3);}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:0.4rem;font-family:var(--font-c);font-size:0.75rem;
+  font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:0.5rem 1rem;
+  border-radius:2px;cursor:pointer;transition:all 0.2s;border:none;white-space:nowrap;
+}
+.btn-red{background:var(--red);color:var(--white);}
+.btn-red:hover{background:var(--red-dark);box-shadow:0 4px 16px var(--red-glow);}
+.btn-outline{background:transparent;color:var(--gray-3);border:1px solid var(--dark-4);}
+.btn-outline:hover{border-color:var(--red);color:var(--red);}
+.btn-sm{padding:0.3rem 0.65rem;font-size:0.68rem;}
+.btn-green{background:rgba(32,200,100,0.15);color:#20c864;border:1px solid rgba(32,200,100,0.3);}
+.btn-green:hover{background:rgba(32,200,100,0.25);}
+.btn-icon{background:transparent;border:1px solid var(--dark-4);color:var(--gray-3);padding:0.3rem 0.5rem;}
+.btn-icon:hover{border-color:var(--red);color:var(--red);}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--dark-2);border:1px solid var(--dark-3);border-radius:4px;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;}
+.modal-header{padding:1.2rem 1.5rem;border-bottom:1px solid var(--dark-3);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:var(--font-d);font-size:1.4rem;letter-spacing:0.08em;}
+.modal-close{background:none;border:none;color:var(--gray-3);font-size:1.2rem;cursor:pointer;padding:0.3rem;}
+.modal-close:hover{color:var(--red);}
+.modal-body{padding:1.5rem;}
+.modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--dark-3);display:flex;gap:0.8rem;justify-content:flex-end;}
+
+/* ── FORM ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+.form-row.full{grid-template-columns:1fr;}
+.form-row.three{grid-template-columns:1fr 1fr 1fr;}
+.field label{display:block;font-family:var(--font-c);font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray-3);margin-bottom:0.4rem;}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);
+  padding:0.65rem 0.85rem;font-family:var(--font-b);font-size:0.88rem;border-radius:2px;outline:none;
+  transition:border-color 0.2s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--red);}
+.field select option{background:var(--dark-3);}
+.field textarea{resize:vertical;min-height:80px;}
+.field-note{font-size:0.72rem;color:var(--gray-2);margin-top:0.3rem;}
+
+/* ── MEMBER DETAIL ── */
+.member-header{display:flex;align-items:center;gap:1.5rem;margin-bottom:1.5rem;}
+.member-avatar{width:64px;height:64px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:1.8rem;flex-shrink:0;}
+.member-info h2{font-family:var(--font-d);font-size:1.6rem;letter-spacing:0.06em;}
+.member-info p{font-size:0.82rem;color:var(--gray-3);}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.8rem;margin-bottom:1.5rem;}
+.info-box{background:var(--dark-3);border-radius:4px;padding:0.9rem 1rem;}
+.info-box-label{font-family:var(--font-c);font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-1);margin-bottom:0.3rem;}
+.info-box-val{font-size:0.9rem;font-weight:600;}
+
+/* ── WORKOUT SCHEDULE TABLE ── */
+.day-plan{background:var(--dark-3);border-radius:4px;margin-bottom:0.8rem;}
+.day-plan-header{
+  padding:0.7rem 1rem;display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--font-c);font-size:0.8rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
+  cursor:pointer;
+}
+.day-plan-header:hover{color:var(--red);}
+.day-exercises{padding:0 1rem 0.8rem;display:none;}
+.day-exercises.open{display:block;}
+.exercise-row{display:flex;align-items:center;gap:0.8rem;padding:0.45rem 0;border-bottom:1px solid var(--dark-4);font-size:0.84rem;}
+.exercise-row:last-child{border-bottom:none;}
+.ex-name{flex:1;font-weight:600;}
+.ex-sets{color:var(--red);font-family:var(--font-c);font-weight:700;font-size:0.8rem;min-width:90px;}
+.ex-reps{color:var(--gray-3);font-size:0.78rem;min-width:70px;}
+
+/* ── PAYMENT TIMELINE ── */
+.pay-timeline{position:relative;padding-left:1.5rem;}
+.pay-timeline::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--dark-4);}
+.pay-item{position:relative;margin-bottom:1.2rem;}
+.pay-dot{width:14px;height:14px;border-radius:50%;position:absolute;left:-1.5rem;top:3px;border:2px solid var(--dark-4);}
+.pay-dot.paid{background:var(--red);border-color:var(--red);}
+.pay-dot.pending{background:transparent;border-color:#ffc832;}
+.pay-date{font-family:var(--font-c);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-1);}
+.pay-info{font-size:0.88rem;font-weight:600;}
+.pay-amount{color:var(--red);font-family:var(--font-c);font-weight:700;}
+
+/* ── SEARCH ── */
+.search-bar{
+  background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);
+  padding:0.6rem 1rem;font-family:var(--font-b);font-size:0.88rem;border-radius:2px;outline:none;
+  transition:border-color 0.2s;width:240px;
+}
+.search-bar:focus{border-color:var(--red);}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:2rem;right:2rem;background:var(--dark-3);border:1px solid var(--red);
+  color:var(--white);padding:0.8rem 1.4rem;border-radius:4px;font-size:0.87rem;
+  z-index:9999;transform:translateY(60px);opacity:0;transition:all 0.3s;pointer-events:none;
+}
+#toast.show{transform:translateY(0);opacity:1;}
+
+/* ── MOBILE BOTTOM NAV ── */
+#mobile-nav{display:none;}
+#mobile-topbar{display:none;}
+#hamburger{display:none;}
+#sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99;backdrop-filter:blur(2px);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  /* Hide desktop sidebar, show mobile nav */
+  #sidebar{
+    transform:translateX(-100%);
+    transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    z-index:200;
+    width:280px;
+  }
+  #sidebar.open{transform:translateX(0);}
+  #sidebar-overlay{display:block;}
+  #sidebar-overlay.active{display:block;}
+
+  #main{margin-left:0;padding-bottom:72px;}
+  
+  /* Mobile topbar */
+  .topbar{padding:0.75rem 1rem;gap:0.5rem;}
+  .topbar-title{font-size:1.2rem;}
+  .topbar-actions{gap:0.5rem;}
+  .search-bar{width:140px;font-size:0.8rem;padding:0.5rem 0.75rem;}
+  
+  /* Mobile hamburger */
+  #hamburger{
+    display:flex;align-items:center;justify-content:center;
+    background:transparent;border:1px solid var(--dark-4);color:var(--gray-3);
+    width:36px;height:36px;border-radius:4px;cursor:pointer;font-size:1rem;
+    flex-shrink:0;transition:all 0.2s;
+  }
+  #hamburger:hover{border-color:var(--red);color:var(--red);}
+
+  /* Content padding */
+  .content{padding:1rem;}
+  
+  /* Bottom nav */
+  #mobile-nav{
+    display:flex;
+    position:fixed;bottom:0;left:0;right:0;
+    background:var(--dark);
+    border-top:1px solid var(--dark-3);
+    z-index:150;
+    height:64px;
+    padding:0;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .mob-nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;cursor:pointer;color:var(--gray-2);transition:color 0.2s;
+    font-family:var(--font-c);font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;
+    padding:8px 4px;border:none;background:none;position:relative;
+  }
+  .mob-nav-item i{font-size:1.15rem;transition:color 0.2s,transform 0.2s;}
+  .mob-nav-item.active{color:var(--red);}
+  .mob-nav-item.active i{transform:translateY(-1px);}
+  .mob-nav-item::before{
+    content:'';position:absolute;top:0;left:20%;right:20%;height:2px;
+    background:var(--red);border-radius:0 0 3px 3px;
+    opacity:0;transition:opacity 0.2s;
+  }
+  .mob-nav-item.active::before{opacity:1;}
+  .mob-nav-badge{
+    position:absolute;top:6px;right:calc(50% - 18px);
+    background:var(--red);color:var(--white);
+    font-size:0.5rem;font-weight:700;font-family:var(--font-b);
+    width:15px;height:15px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  /* Form adjustments */
+  .form-row{grid-template-columns:1fr;}
+  .form-row.three{grid-template-columns:1fr 1fr;}
+  
+  /* Stats grid */
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .stat-card{padding:1rem;}
+  .stat-val{font-size:1.6rem;}
+  
+  /* Tables — horizontal scroll */
+  .panel-card{border-radius:4px;}
+  .panel-card-header{padding:0.8rem 1rem;flex-wrap:wrap;gap:0.5rem;}
+  .panel-card-title{font-size:0.78rem;}
+  
+  /* Member cards on mobile */
+  .member-header{flex-direction:column;align-items:flex-start;gap:1rem;}
+  .info-grid{grid-template-columns:1fr 1fr;}
+  
+  /* Toast position on mobile */
+  #toast{bottom:80px;right:1rem;left:1rem;right:1rem;text-align:center;}
+
+  /* Modal full-screen on mobile */
+  .modal-overlay{padding:0;align-items:flex-end;}
+  .modal{border-radius:12px 12px 0 0;max-height:92vh;}
+  .modal-header{padding:1rem 1.2rem;}
+  .modal-body{padding:1rem 1.2rem;}
+  .modal-footer{padding:0.75rem 1.2rem;}
+}
+
+@media(min-width:769px){
+  #mobile-nav{display:none!important;}
+  #hamburger{display:none!important;}
+}
+
+.cred-copy{
+  display:flex;align-items:center;gap:0.5rem;background:var(--dark-3);border:1px solid var(--red);
+  border-radius:4px;padding:1rem 1.2rem;margin-top:1rem;
+}
+.cred-copy code{font-family:monospace;font-size:0.95rem;color:var(--white);flex:1;}
+.dot-active{display:inline-block;width:7px;height:7px;background:#20c864;border-radius:50%;margin-right:5px;vertical-align:middle;}
+.dot-inactive{display:inline-block;width:7px;height:7px;background:var(--gray-2);border-radius:50%;margin-right:5px;vertical-align:middle;}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOGIN ═══════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">IRON <span>PULSE</span></div>
+    <div class="login-sub">Admin Control Panel</div>
+    <div class="login-err" id="login-err"><i class="fa-solid fa-circle-exclamation"></i> Invalid credentials. Try admin / admin123</div>
+    <div class="form-group"><label>Admin Username</label><input type="text" id="l-user" placeholder="admin"/></div>
+    <div class="form-group"><label>Password</label><input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <button class="btn-login" onclick="doLogin()"><i class="fa-solid fa-shield-halved"></i> &nbsp; Login to Admin Panel</button>
+    <p class="login-hint">Demo: <span>admin</span> / <span>admin123</span></p>
+  </div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div id="app" style="display:none;width:100%;display:none;">
+
+<!-- SIDEBAR OVERLAY (mobile) -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sb-logo">
+    <h1>IRON <span>PULSE</span></h1>
+    <small>ADMIN PANEL — MADHAPUR</small>
+  </div>
+  <div class="sb-admin">
+    <div class="sb-avatar">A</div>
+    <div class="sb-admin-info">
+      <div class="sb-admin-name">Admin</div>
+      <div class="sb-admin-role">Super Admin</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Main</div>
+    <div class="sb-item active" onclick="showPage('dashboard')"><i class="fa-solid fa-gauge-high"></i> Dashboard</div>
+    <div class="sb-item" onclick="showPage('members')"><i class="fa-solid fa-users"></i> Members</div>
+    <div class="sb-item" onclick="showPage('add-member')"><i class="fa-solid fa-user-plus"></i> Add Member</div>
+    <div class="sb-section">Management</div>
+    <div class="sb-item" onclick="showPage('workouts')"><i class="fa-solid fa-dumbbell"></i> Workout Plans</div>
+    <div class="sb-item" onclick="showPage('diet')"><i class="fa-solid fa-bowl-food"></i> Diet Plans</div>
+    <div class="sb-item" onclick="showPage('fees')"><i class="fa-solid fa-indian-rupee-sign"></i> Fee Records</div>
+  </nav>
+  <div class="sb-logout">
+    <button onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div id="main">
+  <div class="topbar">
+    <button id="hamburger" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+    <div class="topbar-title" id="page-title">DASHBOARD</div>
+    <div class="topbar-actions">
+      <input class="search-bar" type="text" placeholder="Search…" id="global-search" oninput="globalSearch()"/>
+      <button class="btn btn-red" onclick="showPage('add-member')" style="white-space:nowrap;"><i class="fa-solid fa-plus"></i> <span class="btn-label">Add</span></button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page-section active" id="page-dashboard">
+      <div class="stat-grid" id="stat-grid"></div>
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <span class="panel-card-title">Recent Members</span>
+          <button class="btn btn-outline btn-sm" onclick="showPage('members')">View All</button>
+        </div>
+        <div style="overflow-x:auto;"><table><thead><tr><th>Name</th><th>ID</th><th>Plan</th><th>Joined</th><th>Fee Status</th><th>Actions</th></tr></thead><tbody id="dash-members-table"></tbody></table></div>
+      </div>
+      <div class="panel-card">
+        <div class="panel-card-header"><span class="panel-card-title">Fee Alerts — Due This Month</span></div>
+        <div style="overflow-x:auto;"><table><thead><tr><th>Member</th><th>Last Paid</th><th>Next Due</th><th>Amount</th><th>Action</th></tr></thead><tbody id="fee-alerts-table"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ── MEMBERS ── -->
+    <div class="page-section" id="page-members">
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <span class="panel-card-title">All Members</span>
+          <button class="btn btn-red" onclick="showPage('add-member')"><i class="fa-solid fa-plus"></i> Add Member</button>
+        </div>
+        <div style="overflow-x:auto;"><table><thead><tr><th>Name</th><th>User ID</th><th>Phone</th><th>Plan</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead><tbody id="members-table"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ── ADD MEMBER ── -->
+    <div class="page-section" id="page-add-member">
+      <div class="panel-card">
+        <div class="panel-card-header"><span class="panel-card-title">New Member Registration</span></div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="field"><label>Full Name *</label><input type="text" id="f-name" placeholder="e.g. Rahul Sharma"/></div>
+            <div class="field"><label>Phone Number *</label><input type="text" id="f-phone" placeholder="+91 98765 43210"/></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Email</label><input type="email" id="f-email" placeholder="rahul@email.com"/></div>
+            <div class="field"><label>Date of Birth</label><input type="date" id="f-dob"/></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Membership Plan *</label>
+              <select id="f-plan" onchange="autoFillFee(this.value)">
+                <option value="">Select Plan</option>
+                <option>Basic – ₹999/month</option>
+                <option>Standard – ₹1499/month</option>
+                <option>Elite – ₹2499/month</option>
+              </select>
+            </div>
+            <div class="field"><label>Join Date *</label><input type="date" id="f-joindate"/></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Workout Goal</label>
+              <select id="f-goal">
+                <option>Fat Loss</option><option>Muscle Gain</option><option>General Fitness</option><option>Strength Building</option><option>Endurance</option>
+              </select>
+            </div>
+            <div class="field"><label>Assign Trainer</label>
+              <select id="f-trainer">
+                <option>Kiran Reddy</option><option>Priya Menon</option><option>Arjun Singh</option><option>No Trainer</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="field"><label>Health Notes / Medical Conditions</label><textarea id="f-health" placeholder="e.g. Knee injury, diabetes…"></textarea></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Fee Amount (₹)</label><input type="number" id="f-fee" placeholder="999"/></div>
+            <div class="field"><label>Fee Paid Date</label><input type="date" id="f-feepaid"/></div>
+          </div>
+          <div class="form-row" style="margin-top:0.2rem;">
+            <div class="field">
+              <label>Set Member Password *</label>
+              <div style="display:flex;gap:0.5rem;align-items:center;">
+                <input type="text" id="f-password" placeholder="e.g. rahul@123" style="flex:1;"/>
+                <button type="button" class="btn btn-outline btn-sm" onclick="generatePassword()" title="Auto-generate a password" style="white-space:nowrap;height:100%;padding:0.65rem 0.8rem;">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Generate
+                </button>
+              </div>
+              <p class="field-note" style="margin-top:0.4rem;"><i class="fa-solid fa-circle-info"></i> This is the password the member will use to log in to the portal. Share it with them after registration.</p>
+            </div>
+          </div>
+          <div style="margin-top:0.8rem;">
+            <button class="btn btn-red" onclick="addMember()"><i class="fa-solid fa-user-plus"></i> Register Member & Generate Credentials</button>
+          </div>
+          <div id="new-creds" style="display:none;margin-top:1.5rem;">
+            <div style="font-family:var(--font-c);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-3);margin-bottom:0.5rem;">Member Credentials Generated</div>
+            <div class="cred-copy">
+              <i class="fa-solid fa-key" style="color:var(--red);"></i>
+              <code id="cred-display"></code>
+              <button class="btn btn-sm btn-outline" onclick="copyCreds()"><i class="fa-solid fa-copy"></i> Copy</button>
+            </div>
+            <p style="font-size:0.78rem;color:var(--gray-1);margin-top:0.6rem;"><i class="fa-solid fa-circle-info"></i> Share these credentials with the member to log in to their portal.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── WORKOUTS ── -->
+    <div class="page-section" id="page-workouts">
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <span class="panel-card-title">Workout Plan Manager</span>
+          <button class="btn btn-red" onclick="openWorkoutModal()"><i class="fa-solid fa-plus"></i> Assign Plan</button>
+        </div>
+        <div style="overflow-x:auto;"><table><thead><tr><th>Member</th><th>Goal</th><th>Days/Week</th><th>Current Week</th><th>Last Updated</th><th>Actions</th></tr></thead><tbody id="workout-table"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ── DIET ── -->
+    <div class="page-section" id="page-diet">
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <span class="panel-card-title">Diet Plan Manager</span>
+          <button class="btn btn-red" onclick="openDietModal()"><i class="fa-solid fa-plus"></i> Assign Diet</button>
+        </div>
+        <div style="overflow-x:auto;"><table><thead><tr><th>Member</th><th>Diet Type</th><th>Calories/Day</th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Actions</th></tr></thead><tbody id="diet-table"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ── FEES ── -->
+    <div class="page-section" id="page-fees">
+      <div class="panel-card">
+        <div class="panel-card-header">
+          <span class="panel-card-title">Fee & Payment Records</span>
+          <button class="btn btn-red" onclick="openFeeModal()"><i class="fa-solid fa-plus"></i> Record Payment</button>
+        </div>
+        <div style="overflow-x:auto;"><table><thead><tr><th>Member</th><th>Plan</th><th>Amount</th><th>Paid Date</th><th>Next Due</th><th>Status</th><th>Actions</th></tr></thead><tbody id="fees-table"></tbody></table></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ═══════════ MOBILE BOTTOM NAV ═══════════ -->
+<nav id="mobile-nav">
+  <button class="mob-nav-item active" id="mnav-dashboard" onclick="showPage('dashboard');setMobNav('dashboard')">
+    <i class="fa-solid fa-gauge-high"></i>
+    <span>Home</span>
+  </button>
+  <button class="mob-nav-item" id="mnav-members" onclick="showPage('members');setMobNav('members')">
+    <i class="fa-solid fa-users"></i>
+    <span>Members</span>
+  </button>
+  <button class="mob-nav-item" id="mnav-add-member" onclick="showPage('add-member');setMobNav('add-member')" style="position:relative;">
+    <div style="width:48px;height:48px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:-20px;box-shadow:0 4px 16px rgba(232,25,44,0.5);border:3px solid var(--dark);">
+      <i class="fa-solid fa-user-plus" style="font-size:1rem;color:#fff;"></i>
+    </div>
+    <span style="margin-top:2px;">Add</span>
+  </button>
+  <button class="mob-nav-item" id="mnav-workouts" onclick="showPage('workouts');setMobNav('workouts')">
+    <i class="fa-solid fa-dumbbell"></i>
+    <span>Workouts</span>
+  </button>
+  <button class="mob-nav-item" id="mnav-fees" onclick="showPage('fees');setMobNav('fees')">
+    <i class="fa-solid fa-indian-rupee-sign"></i>
+    <span>Fees</span>
+  </button>
+</nav>
+
+</div><!-- /app -->
+
+<!-- ═══ MEMBER EDIT MODAL ═══ -->
+<div class="modal-overlay" id="member-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="member-modal-title">Edit Member</span>
+      <button class="modal-close" onclick="closeModal('member-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="member-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('member-modal')">Cancel</button>
+      <button class="btn btn-red" onclick="saveMemberEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MEMBER VIEW MODAL ═══ -->
+<div class="modal-overlay" id="view-modal">
+  <div class="modal" style="max-width:800px;">
+    <div class="modal-header">
+      <span class="modal-title">Member Profile</span>
+      <button class="modal-close" onclick="closeModal('view-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="view-modal-body"></div>
+  </div>
+</div>
+
+<!-- ═══ WORKOUT MODAL ═══ -->
+<div class="modal-overlay" id="workout-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Assign / Edit Workout Plan</span>
+      <button class="modal-close" onclick="closeModal('workout-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="field"><label>Member *</label><select id="wm-member" style="width:100%;background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;outline:none;" onchange=""></select></div>
+        <div class="field"><label>Days Per Week</label>
+          <select id="wm-days" style="width:100%;background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;outline:none;">
+            <option>3</option><option>4</option><option>5</option><option>6</option>
+          </select>
+        </div>
+      </div>
+      <div id="wm-exercises-container">
+        <div style="font-family:var(--font-c);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-3);margin-bottom:0.8rem;">Weekly Exercise Schedule</div>
+        <!-- days auto-generated -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('workout-modal')">Cancel</button>
+      <button class="btn btn-red" onclick="saveWorkout()">Save Plan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DIET MODAL ═══ -->
+<div class="modal-overlay" id="diet-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Assign Diet Plan</span>
+      <button class="modal-close" onclick="closeModal('diet-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="field"><label>Member *</label><select id="dm-member" style="width:100%;background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;outline:none;"></select></div>
+        <div class="field"><label>Diet Type</label>
+          <select id="dm-type" style="width:100%;background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;outline:none;">
+            <option>High Protein</option><option>Keto</option><option>Balanced</option><option>Vegan</option><option>Calorie Deficit</option><option>Calorie Surplus</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row three">
+        <div class="field"><label>Calories/Day</label><input type="number" id="dm-cal" placeholder="2000" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;"/></div>
+        <div class="field"><label>Protein (g)</label><input type="number" id="dm-protein" placeholder="150" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;"/></div>
+        <div class="field"><label>Carbs (g)</label><input type="number" id="dm-carbs" placeholder="200" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Fat (g)</label><input type="number" id="dm-fat" placeholder="60" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;"/></div>
+      </div>
+      <div class="form-row full">
+        <div class="field"><label>Meal Notes</label><textarea id="dm-notes" placeholder="Breakfast: 3 eggs, oats…&#10;Lunch: Chicken rice…&#10;Dinner: Salad, paneer…" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;resize:vertical;min-height:100px;font-family:var(--font-b);"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('diet-modal')">Cancel</button>
+      <button class="btn btn-red" onclick="saveDiet()">Save Diet Plan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FEE MODAL ═══ -->
+<div class="modal-overlay" id="fee-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Record Fee Payment</span>
+      <button class="modal-close" onclick="closeModal('fee-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="field"><label>Member *</label><select id="fm-member" style="width:100%;background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;outline:none;"></select></div>
+        <div class="field"><label>Amount (₹) *</label><input type="number" id="fm-amount" placeholder="1499" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Paid Date *</label><input type="date" id="fm-paiddate" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;"/></div>
+        <div class="field"><label>Next Due Date *</label><input type="date" id="fm-nextdue" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;"/></div>
+      </div>
+      <div class="form-row full">
+        <div class="field"><label>Payment Mode</label>
+          <select id="fm-mode" style="width:100%;background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;outline:none;">
+            <option>Cash</option><option>UPI</option><option>Card</option><option>Net Banking</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('fee-modal')">Cancel</button>
+      <button class="btn btn-red" onclick="saveFee()">Record Payment</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════════
+//  MOBILE NAV & SIDEBAR TOGGLE
+// ════════════════════════════════════════
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('active');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('active');
+}
+function setMobNav(page){
+  document.querySelectorAll('.mob-nav-item').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('mnav-'+page);
+  if(el)el.classList.add('active');
+  closeSidebar();
+}
+
+// ════════════════════════════════════════
+//  DATA STORE (localStorage-backed)
+// ════════════════════════════════════════
+const ADMIN_USER='admin', ADMIN_PASS='admin123';
+const PORTAL_URL='member-portal.html'; // sibling file
+
+function load(k){try{return JSON.parse(localStorage.getItem(k))||null;}catch{return null;}}
+function save(k,v){localStorage.setItem(k,JSON.stringify(v));}
+
+let members = load('ip_members') || [
+  {id:'IPF001',name:'Aakash Mehta',phone:'9876543210',email:'aakash@gmail.com',dob:'1995-04-15',plan:'Standard – ₹1499/month',joindate:'2025-01-10',goal:'Muscle Gain',trainer:'Kiran Reddy',health:'None',fee:1499,feepaid:'2025-05-01',feedue:'2025-06-01',password:'aakash@001',active:true},
+  {id:'IPF002',name:'Sneha Rao',phone:'9988776655',email:'sneha@gmail.com',dob:'1998-07-22',plan:'Elite – ₹2499/month',joindate:'2025-02-15',goal:'Fat Loss',trainer:'Priya Menon',health:'None',fee:2499,feepaid:'2025-05-10',feedue:'2025-06-10',password:'sneha@002',active:true},
+  {id:'IPF003',name:'Vikram Nair',phone:'9123456789',email:'vikram@gmail.com',dob:'1992-11-30',plan:'Basic – ₹999/month',joindate:'2025-03-01',goal:'General Fitness',trainer:'Arjun Singh',health:'Mild BP',fee:999,feepaid:'2025-04-15',feedue:'2025-05-15',password:'vikram@003',active:true},
+];
+
+let workoutPlans = load('ip_workouts') || {
+  'IPF001':{days:5,schedule:{Mon:'Chest & Triceps',Tue:'Back & Biceps',Wed:'Legs',Thu:'Shoulders',Fri:'Core & Cardio'},updated:'2025-05-01'},
+  'IPF002':{days:4,schedule:{Mon:'Full Body HIIT',Wed:'Cardio + Core',Fri:'Strength Circuit',Sat:'Yoga & Stretch'},updated:'2025-05-05'},
+  'IPF003':{days:3,schedule:{Mon:'Full Body A',Wed:'Full Body B',Fri:'Cardio'},updated:'2025-04-28'},
+};
+
+let dietPlans = load('ip_diets') || {
+  'IPF001':{type:'High Protein',calories:2800,protein:200,carbs:280,fat:70,notes:'Breakfast: 5 eggs + oats\nLunch: 200g chicken + rice\nDinner: Paneer + salad\nSnacks: Whey protein + banana'},
+  'IPF002':{type:'Calorie Deficit',calories:1600,protein:130,carbs:150,fat:45,notes:'Breakfast: Egg whites + toast\nLunch: Tuna salad\nDinner: Grilled veg + dal\nSnacks: Almonds'},
+  'IPF003':{type:'Balanced',calories:2000,protein:120,carbs:220,fat:60,notes:'Balanced home-cooked meals. Avoid processed food.'},
+};
+
+let feeRecords = load('ip_fees') || [];
+
+// ════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════
+function doLogin(){
+  const u=document.getElementById('l-user').value.trim();
+  const p=document.getElementById('l-pass').value.trim();
+  if(u===ADMIN_USER&&p===ADMIN_PASS){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    initApp();
+  }else{
+    const e=document.getElementById('login-err');
+    e.style.display='block';
+    setTimeout(()=>e.style.display='none',3000);
+  }
+}
+function doLogout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('l-user').value='';
+  document.getElementById('l-pass').value='';
+}
+
+// ════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════
+const titles={dashboard:'Dashboard',members:'All Members','add-member':'Add New Member',workouts:'Workout Plans',diet:'Diet Plans',fees:'Fee Records'};
+function showPage(p){
+  document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(s=>s.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(s=>{if(s.getAttribute('onclick')&&s.getAttribute('onclick').includes("'"+p+"'"))s.classList.add('active');});
+  document.getElementById('page-title').textContent=(titles[p]||p).toUpperCase();
+  setMobNav(p);
+  if(p==='dashboard')renderDashboard();
+  if(p==='members')renderMembersTable();
+  if(p==='workouts')renderWorkoutTable();
+  if(p==='diet')renderDietTable();
+  if(p==='fees')renderFeesTable();
+  if(p==='add-member'){document.getElementById('new-creds').style.display='none';document.getElementById('f-joindate').value=today();}
+}
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+function initApp(){
+  renderDashboard();
+  populateMemberDropdowns();
+  buildWorkoutModal();
+}
+
+function today(){return new Date().toISOString().split('T')[0];}
+function addMonths(d,n){const dt=new Date(d);dt.setMonth(dt.getMonth()+n);return dt.toISOString().split('T')[0];}
+function fmtDate(d){if(!d)return '—';const dt=new Date(d);return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}
+function initials(name){return name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();}
+
+// ════════════════════════════════════════
+//  DASHBOARD
+// ════════════════════════════════════════
+function renderDashboard(){
+  const now=new Date();
+  const active=members.filter(m=>m.active).length;
+  const due=members.filter(m=>new Date(m.feedue)<=new Date(now.getFullYear(),now.getMonth()+1,0)).length;
+  const totalFee=members.reduce((a,m)=>a+Number(m.fee),0);
+
+  document.getElementById('stat-grid').innerHTML=`
+    <div class="stat-card"><div class="stat-icon red"><i class="fa-solid fa-users"></i></div><div><div class="stat-val">${members.length}</div><div class="stat-lbl">Total Members</div></div></div>
+    <div class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div><div><div class="stat-val">${active}</div><div class="stat-lbl">Active Members</div></div></div>
+    <div class="stat-card"><div class="stat-icon yellow"><i class="fa-solid fa-triangle-exclamation"></i></div><div><div class="stat-val">${due}</div><div class="stat-lbl">Fee Due</div></div></div>
+    <div class="stat-card"><div class="stat-icon blue"><i class="fa-solid fa-indian-rupee-sign"></i></div><div><div class="stat-val">₹${totalFee.toLocaleString()}</div><div class="stat-lbl">Monthly Revenue</div></div></div>
+  `;
+
+  const recent=members.slice(-5).reverse();
+  document.getElementById('dash-members-table').innerHTML=recent.map(m=>`
+    <tr>
+      <td><b>${m.name}</b></td>
+      <td><span style="color:var(--red);font-family:var(--font-c);font-weight:700;">${m.id}</span></td>
+      <td>${m.plan.split('–')[0].trim()}</td>
+      <td>${fmtDate(m.joindate)}</td>
+      <td><span class="badge ${new Date(m.feedue)<new Date()?'badge-red':'badge-green'}">${new Date(m.feedue)<new Date()?'Overdue':'Paid'}</span></td>
+      <td><button class="btn btn-icon btn-sm" onclick="viewMember('${m.id}')"><i class="fa-solid fa-eye"></i></button></td>
+    </tr>
+  `).join('');
+
+  const dueMembers=members.filter(m=>{const d=new Date(m.feedue);const n=new Date();return d<=new Date(n.getFullYear(),n.getMonth()+1,31);});
+  document.getElementById('fee-alerts-table').innerHTML=dueMembers.length?dueMembers.map(m=>`
+    <tr>
+      <td><b>${m.name}</b></td>
+      <td>${fmtDate(m.feepaid)}</td>
+      <td>${fmtDate(m.feedue)}</td>
+      <td class="pay-amount">₹${m.fee}</td>
+      <td><button class="btn btn-red btn-sm" onclick="quickRecordFee('${m.id}')"><i class="fa-solid fa-check"></i> Mark Paid</button></td>
+    </tr>
+  `).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--gray-2);padding:2rem;">No dues this month 🎉</td></tr>';
+}
+
+// ════════════════════════════════════════
+//  MEMBERS TABLE
+// ════════════════════════════════════════
+function renderMembersTable(filter=''){
+  const list=filter?members.filter(m=>m.name.toLowerCase().includes(filter)||m.id.toLowerCase().includes(filter)||m.phone.includes(filter)):members;
+  document.getElementById('members-table').innerHTML=list.length?list.map(m=>`
+    <tr>
+      <td><b>${m.name}</b></td>
+      <td><span style="color:var(--red);font-family:var(--font-c);font-weight:700;">${m.id}</span></td>
+      <td>${m.phone}</td>
+      <td>${m.plan.split('–')[0].trim()}</td>
+      <td>${fmtDate(m.joindate)}</td>
+      <td><span class="badge ${m.active?'badge-green':'badge-gray'}">${m.active?'Active':'Inactive'}</span></td>
+      <td style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+        <button class="btn btn-icon btn-sm" title="View" onclick="viewMember('${m.id}')"><i class="fa-solid fa-eye"></i></button>
+        <button class="btn btn-icon btn-sm" title="Edit" onclick="editMember('${m.id}')"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-icon btn-sm" title="Toggle Active" onclick="toggleActive('${m.id}')"><i class="fa-solid fa-toggle-on"></i></button>
+        <button class="btn btn-icon btn-sm" title="Show Creds" onclick="showCreds('${m.id}')"><i class="fa-solid fa-key"></i></button>
+      </td>
+    </tr>
+  `).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--gray-2);padding:2rem;">No members found.</td></tr>';
+}
+
+function globalSearch(){
+  const q=document.getElementById('global-search').value.toLowerCase();
+  if(document.getElementById('page-members').classList.contains('active'))renderMembersTable(q);
+}
+
+// ════════════════════════════════════════
+//  ADD MEMBER
+// ════════════════════════════════════════
+function genId(){return 'IPF'+String(members.length+1).padStart(3,'0');}
+function genPass(name){return name.split(' ')[0].toLowerCase()+'@'+Math.floor(100+Math.random()*900);}
+
+function generatePassword(){
+  const name=document.getElementById('f-name').value.trim();
+  const base=name?name.split(' ')[0].toLowerCase():'member';
+  document.getElementById('f-password').value=base+'@'+Math.floor(100+Math.random()*900);
+}
+
+function autoFillFee(plan){
+  const map={'Basic – ₹999/month':999,'Standard – ₹1499/month':1499,'Elite – ₹2499/month':2499};
+  const fee=map[plan];
+  if(fee)document.getElementById('f-fee').value=fee;
+}
+
+function addMember(){
+  const name=document.getElementById('f-name').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  const plan=document.getElementById('f-plan').value;
+  const joindate=document.getElementById('f-joindate').value;
+  const pwd=document.getElementById('f-password').value.trim();
+  if(!name||!phone||!plan||!joindate){toast('⚠ Fill in all required fields.');return;}
+  if(!pwd){toast('⚠ Please set a password for this member.');document.getElementById('f-password').focus();return;}
+  const id=genId();
+  const feepaid=document.getElementById('f-feepaid').value||joindate;
+  const member={
+    id,name,phone,
+    email:document.getElementById('f-email').value,
+    dob:document.getElementById('f-dob').value,
+    plan,joindate,
+    goal:document.getElementById('f-goal').value,
+    trainer:document.getElementById('f-trainer').value,
+    health:document.getElementById('f-health').value,
+    fee:Number(document.getElementById('f-fee').value)||999,
+    feepaid,
+    feedue:addMonths(feepaid,1),
+    password:pwd,
+    active:true
+  };
+  members.push(member);
+  save('ip_members',members);
+  populateMemberDropdowns();
+  document.getElementById('cred-display').textContent=`User ID: ${id}   |   Password: ${pwd}`;
+  document.getElementById('new-creds').style.display='block';
+  toast('✅ Member registered! Credentials generated.');
+  ['f-name','f-phone','f-email','f-dob','f-fee','f-password'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-feepaid').value='';
+  document.getElementById('f-plan').value='';
+}
+
+function copyCreds(){
+  const t=document.getElementById('cred-display').textContent;
+  navigator.clipboard.writeText(t).then(()=>toast('Credentials copied to clipboard!'));
+}
+
+// ════════════════════════════════════════
+//  VIEW MEMBER
+// ════════════════════════════════════════
+function viewMember(id){
+  const m=members.find(x=>x.id===id);if(!m)return;
+  const w=workoutPlans[id];
+  const d=dietPlans[id];
+  document.getElementById('view-modal-body').innerHTML=`
+    <div class="member-header">
+      <div class="member-avatar">${initials(m.name)}</div>
+      <div class="member-info">
+        <h2>${m.name}</h2>
+        <p>${m.id} &nbsp;·&nbsp; ${m.plan} &nbsp;·&nbsp; ${m.active?'<span class="badge badge-green">Active</span>':'<span class="badge badge-gray">Inactive</span>'}</p>
+        <p style="margin-top:0.3rem;"><i class="fa-solid fa-key" style="color:var(--red);font-size:0.75rem;"></i> Login Password: <b style="color:var(--red);">${m.password}</b></p>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-box"><div class="info-box-label">Phone</div><div class="info-box-val">${m.phone}</div></div>
+      <div class="info-box"><div class="info-box-label">Email</div><div class="info-box-val">${m.email||'—'}</div></div>
+      <div class="info-box"><div class="info-box-label">Joined</div><div class="info-box-val">${fmtDate(m.joindate)}</div></div>
+      <div class="info-box"><div class="info-box-label">Goal</div><div class="info-box-val">${m.goal}</div></div>
+      <div class="info-box"><div class="info-box-label">Trainer</div><div class="info-box-val">${m.trainer}</div></div>
+      <div class="info-box"><div class="info-box-label">Health Notes</div><div class="info-box-val">${m.health||'None'}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div>
+        <div style="font-family:var(--font-c);font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-3);margin-bottom:0.8rem;"><i class="fa-solid fa-dumbbell" style="color:var(--red);"></i> Workout Schedule</div>
+        ${w?Object.entries(w.schedule).map(([day,ex])=>`
+          <div style="display:flex;gap:1rem;padding:0.5rem 0;border-bottom:1px solid var(--dark-3);font-size:0.85rem;">
+            <span style="color:var(--red);font-family:var(--font-c);font-weight:700;min-width:35px;">${day}</span>
+            <span>${ex}</span>
+          </div>
+        `).join(''):'<p style="color:var(--gray-2);font-size:0.85rem;">No workout plan assigned.</p>'}
+      </div>
+      <div>
+        <div style="font-family:var(--font-c);font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-3);margin-bottom:0.8rem;"><i class="fa-solid fa-bowl-food" style="color:var(--red);"></i> Diet Plan</div>
+        ${d?`
+          <div class="info-box" style="margin-bottom:0.5rem;"><div class="info-box-label">Type</div><div class="info-box-val">${d.type}</div></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:0.8rem;">
+            <div class="info-box"><div class="info-box-label">Cal</div><div class="info-box-val">${d.calories}</div></div>
+            <div class="info-box"><div class="info-box-label">Protein</div><div class="info-box-val">${d.protein}g</div></div>
+            <div class="info-box"><div class="info-box-label">Carbs</div><div class="info-box-val">${d.carbs}g</div></div>
+          </div>
+          <div style="font-size:0.82rem;color:var(--gray-3);white-space:pre-line;">${d.notes}</div>
+        `:'<p style="color:var(--gray-2);font-size:0.85rem;">No diet plan assigned.</p>'}
+      </div>
+    </div>
+    <div style="margin-top:1.2rem;">
+      <div style="font-family:var(--font-c);font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-3);margin-bottom:0.8rem;"><i class="fa-solid fa-indian-rupee-sign" style="color:var(--red);"></i> Fee History</div>
+      <div class="pay-timeline">
+        ${(feeRecords.filter(f=>f.memberId===id).reverse().concat([{memberId:id,amount:m.fee,paiddate:m.feepaid,nextdue:m.feedue,mode:'Cash',_default:true}]).slice(0,5)).map(f=>`
+          <div class="pay-item">
+            <div class="pay-dot paid"></div>
+            <div class="pay-date">${fmtDate(f.paiddate)}</div>
+            <div class="pay-info">Paid <span class="pay-amount">₹${f.amount}</span> via ${f.mode||'Cash'} · Next due: ${fmtDate(f.nextdue)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  openModal('view-modal');
+}
+
+// ════════════════════════════════════════
+//  EDIT MEMBER
+// ════════════════════════════════════════
+let editingId=null;
+function editMember(id){
+  const m=members.find(x=>x.id===id);if(!m)return;
+  editingId=id;
+  document.getElementById('member-modal-title').textContent='Edit — '+m.name;
+  document.getElementById('member-modal-body').innerHTML=`
+    <div class="form-row"><div class="field"><label>Full Name</label><input id="em-name" value="${m.name}" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;"/></div><div class="field"><label>Phone</label><input id="em-phone" value="${m.phone}" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;"/></div></div>
+    <div class="form-row"><div class="field"><label>Email</label><input id="em-email" value="${m.email||''}" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;"/></div><div class="field"><label>Plan</label><select id="em-plan" style="width:100%;background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;outline:none;"><option ${m.plan.startsWith('Basic')?'selected':''}>Basic – ₹999/month</option><option ${m.plan.startsWith('Standard')?'selected':''}>Standard – ₹1499/month</option><option ${m.plan.startsWith('Elite')?'selected':''}>Elite – ₹2499/month</option></select></div></div>
+    <div class="form-row"><div class="field"><label>Trainer</label><select id="em-trainer" style="width:100%;background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;outline:none;"><option ${m.trainer==='Kiran Reddy'?'selected':''}>Kiran Reddy</option><option ${m.trainer==='Priya Menon'?'selected':''}>Priya Menon</option><option ${m.trainer==='Arjun Singh'?'selected':''}>Arjun Singh</option><option ${m.trainer==='No Trainer'?'selected':''}>No Trainer</option></select></div><div class="field"><label>Goal</label><select id="em-goal" style="width:100%;background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;outline:none;"><option ${m.goal==='Fat Loss'?'selected':''}>Fat Loss</option><option ${m.goal==='Muscle Gain'?'selected':''}>Muscle Gain</option><option ${m.goal==='General Fitness'?'selected':''}>General Fitness</option><option ${m.goal==='Strength Building'?'selected':''}>Strength Building</option><option ${m.goal==='Endurance'?'selected':''}>Endurance</option></select></div></div>
+    <div class="form-row"><div class="field"><label>Fee Amount (₹)</label><input id="em-fee" type="number" value="${m.fee}" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;"/></div><div class="field"><label>Fee Next Due</label><input id="em-feedue" type="date" value="${m.feedue}" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;"/></div></div>
+    <div class="form-row full"><div class="field"><label>Health Notes</label><textarea id="em-health" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;resize:vertical;min-height:70px;font-family:var(--font-b);">${m.health||''}</textarea></div></div>
+    <div class="form-row full"><div class="field"><label>Login Password</label><input id="em-pass" value="${m.password}" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.65rem 0.85rem;border-radius:2px;width:100%;outline:none;"/><p class="field-note">Member uses this to log into the portal.</p></div></div>
+  `;
+  openModal('member-modal');
+}
+function saveMemberEdit(){
+  const m=members.find(x=>x.id===editingId);if(!m)return;
+  m.name=document.getElementById('em-name').value;
+  m.phone=document.getElementById('em-phone').value;
+  m.email=document.getElementById('em-email').value;
+  m.plan=document.getElementById('em-plan').value;
+  m.trainer=document.getElementById('em-trainer').value;
+  m.goal=document.getElementById('em-goal').value;
+  m.fee=Number(document.getElementById('em-fee').value);
+  m.feedue=document.getElementById('em-feedue').value;
+  m.health=document.getElementById('em-health').value;
+  m.password=document.getElementById('em-pass').value;
+  save('ip_members',members);
+  closeModal('member-modal');
+  renderMembersTable();
+  renderDashboard();
+  toast('✅ Member updated!');
+}
+
+function toggleActive(id){
+  const m=members.find(x=>x.id===id);if(!m)return;
+  m.active=!m.active;
+  save('ip_members',members);
+  renderMembersTable();
+  toast(`Member ${m.active?'activated':'deactivated'}.`);
+}
+
+function showCreds(id){
+  const m=members.find(x=>x.id===id);if(!m)return;
+  toast(`🔑 ${m.id} / ${m.password}`);
+}
+
+// ════════════════════════════════════════
+//  WORKOUT
+// ════════════════════════════════════════
+function renderWorkoutTable(){
+  document.getElementById('workout-table').innerHTML=members.map(m=>{
+    const w=workoutPlans[m.id];
+    return`<tr>
+      <td><b>${m.name}</b></td>
+      <td>${m.goal}</td>
+      <td>${w?w.days:'—'}</td>
+      <td>${w?Object.values(w.schedule).join(', ').substring(0,50)+'…':'Not assigned'}</td>
+      <td>${w?fmtDate(w.updated):'—'}</td>
+      <td><button class="btn btn-icon btn-sm" onclick="openWorkoutModal('${m.id}')"><i class="fa-solid fa-pen"></i></button></td>
+    </tr>`;
+  }).join('');
+}
+
+function buildWorkoutModal(){
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat'];
+  document.getElementById('wm-exercises-container').innerHTML=`
+    <div style="font-family:var(--font-c);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray-3);margin-bottom:0.8rem;">Weekly Exercise Schedule</div>
+    ${days.map(d=>`
+      <div class="form-row" style="margin-bottom:0.6rem;">
+        <div class="field" style="max-width:60px;"><label>${d}</label></div>
+        <div class="field" style="flex:1;"><input id="wm-${d}" placeholder="e.g. Chest & Triceps" style="background:var(--dark-3);border:1px solid var(--dark-4);color:var(--white);padding:0.55rem 0.85rem;border-radius:2px;width:100%;outline:none;font-family:var(--font-b);font-size:0.85rem;"/></div>
+      </div>
+    `).join('')}
+  `;
+}
+
+let wEditId=null;
+function openWorkoutModal(id=''){
+  wEditId=id||null;
+  populateMemberDropdowns();
+  if(id){
+    document.getElementById('wm-member').value=id;
+    const w=workoutPlans[id];
+    if(w){
+      document.getElementById('wm-days').value=w.days;
+      ['Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{
+        const el=document.getElementById('wm-'+d);
+        if(el)el.value=w.schedule[d]||'';
+      });
+    }
+  }
+  openModal('workout-modal');
+}
+function saveWorkout(){
+  const mid=document.getElementById('wm-member').value;
+  if(!mid){toast('Select a member.');return;}
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat'];
+  const schedule={};
+  days.forEach(d=>{const v=document.getElementById('wm-'+d)?.value?.trim();if(v)schedule[d]=v;});
+  workoutPlans[mid]={days:Number(document.getElementById('wm-days').value),schedule,updated:today()};
+  save('ip_workouts',workoutPlans);
+  closeModal('workout-modal');
+  renderWorkoutTable();
+  toast('✅ Workout plan saved!');
+}
+
+// ════════════════════════════════════════
+//  DIET
+// ════════════════════════════════════════
+function renderDietTable(){
+  document.getElementById('diet-table').innerHTML=members.map(m=>{
+    const d=dietPlans[m.id];
+    return`<tr>
+      <td><b>${m.name}</b></td>
+      <td>${d?d.type:'—'}</td>
+      <td>${d?d.calories:'—'}</td>
+      <td>${d?d.protein+'g':'—'}</td>
+      <td>${d?d.carbs+'g':'—'}</td>
+      <td>${d?d.fat+'g':'—'}</td>
+      <td><button class="btn btn-icon btn-sm" onclick="openDietModal('${m.id}')"><i class="fa-solid fa-pen"></i></button></td>
+    </tr>`;
+  }).join('');
+}
+
+function openDietModal(id=''){
+  populateMemberDropdowns();
+  if(id){
+    document.getElementById('dm-member').value=id;
+    const d=dietPlans[id];
+    if(d){
+      document.getElementById('dm-type').value=d.type;
+      document.getElementById('dm-cal').value=d.calories;
+      document.getElementById('dm-protein').value=d.protein;
+      document.getElementById('dm-carbs').value=d.carbs;
+      document.getElementById('dm-fat').value=d.fat;
+      document.getElementById('dm-notes').value=d.notes||'';
+    }
+  }
+  openModal('diet-modal');
+}
+function saveDiet(){
+  const mid=document.getElementById('dm-member').value;
+  if(!mid){toast('Select a member.');return;}
+  dietPlans[mid]={
+    type:document.getElementById('dm-type').value,
+    calories:Number(document.getElementById('dm-cal').value),
+    protein:Number(document.getElementById('dm-protein').value),
+    carbs:Number(document.getElementById('dm-carbs').value),
+    fat:Number(document.getElementById('dm-fat').value),
+    notes:document.getElementById('dm-notes').value
+  };
+  save('ip_diets',dietPlans);
+  closeModal('diet-modal');
+  renderDietTable();
+  toast('✅ Diet plan saved!');
+}
+
+// ════════════════════════════════════════
+//  FEES
+// ════════════════════════════════════════
+function renderFeesTable(){
+  const all=[...feeRecords,...members.map(m=>({memberId:m.id,memberName:m.name,amount:m.fee,paiddate:m.feepaid,nextdue:m.feedue,mode:'Cash',_default:true,plan:m.plan}))];
+  const byMember={};
+  all.forEach(f=>{if(!byMember[f.memberId])byMember[f.memberId]=f;});
+  const rows=Object.values(byMember).map(f=>{
+    const m=members.find(x=>x.id===f.memberId);
+    const overdue=new Date(f.nextdue)<new Date();
+    return`<tr>
+      <td><b>${m?m.name:f.memberName||f.memberId}</b></td>
+      <td>${m?m.plan.split('–')[0].trim():'—'}</td>
+      <td class="pay-amount">₹${f.amount}</td>
+      <td>${fmtDate(f.paiddate)}</td>
+      <td>${fmtDate(f.nextdue)}</td>
+      <td><span class="badge ${overdue?'badge-red':'badge-green'}">${overdue?'Overdue':'Paid'}</span></td>
+      <td><button class="btn btn-red btn-sm" onclick="quickRecordFee('${f.memberId}')"><i class="fa-solid fa-plus"></i> Record</button></td>
+    </tr>`;
+  });
+  document.getElementById('fees-table').innerHTML=rows.join('')||'<tr><td colspan="7" style="text-align:center;color:var(--gray-2);padding:2rem;">No records.</td></tr>';
+}
+
+function openFeeModal(id=''){
+  populateMemberDropdowns();
+  if(id)document.getElementById('fm-member').value=id;
+  document.getElementById('fm-paiddate').value=today();
+  document.getElementById('fm-nextdue').value=addMonths(today(),1);
+  openModal('fee-modal');
+}
+function quickRecordFee(id){openFeeModal(id);}
+function saveFee(){
+  const mid=document.getElementById('fm-member').value;
+  const amount=document.getElementById('fm-amount').value;
+  const paiddate=document.getElementById('fm-paiddate').value;
+  const nextdue=document.getElementById('fm-nextdue').value;
+  if(!mid||!amount||!paiddate||!nextdue){toast('Fill all required fields.');return;}
+  const m=members.find(x=>x.id===mid);
+  if(m){m.feepaid=paiddate;m.feedue=nextdue;m.fee=Number(amount);save('ip_members',members);}
+  feeRecords.push({memberId:mid,memberName:m?.name,amount:Number(amount),paiddate,nextdue,mode:document.getElementById('fm-mode').value});
+  save('ip_fees',feeRecords);
+  closeModal('fee-modal');
+  renderFeesTable();
+  renderDashboard();
+  toast('✅ Payment recorded!');
+}
+
+// ════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════
+function populateMemberDropdowns(){
+  const sel=document.getElementById('wm-member');
+  const selD=document.getElementById('dm-member');
+  const selF=document.getElementById('fm-member');
+  const opts=`<option value="">— Select Member —</option>`+members.map(m=>`<option value="${m.id}">${m.name} (${m.id})</option>`).join('');
+  if(sel)sel.innerHTML=opts;
+  if(selD)selD.innerHTML=opts;
+  if(selF)selF.innerHTML=opts;
+}
+
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeModal(o.id);}));
+</script>
+</body>
+</html>
