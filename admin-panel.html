@@ -235,7 +235,7 @@ td{padding:0.75rem 1rem;font-size:0.87rem;vertical-align:middle;}
 #mobile-nav{display:none;}
 #mobile-topbar{display:none;}
 #hamburger{display:none;}
-#sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99;backdrop-filter:blur(2px);}
+#sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:99;}
 
 /* ── RESPONSIVE ── */
 @media(max-width:768px){
@@ -247,7 +247,6 @@ td{padding:0.75rem 1rem;font-size:0.87rem;vertical-align:middle;}
     width:280px;
   }
   #sidebar.open{transform:translateX(0);}
-  #sidebar-overlay{display:block;}
   #sidebar-overlay.active{display:block;}
 
   #main{margin-left:0;padding-bottom:72px;}
@@ -310,8 +309,10 @@ td{padding:0.75rem 1rem;font-size:0.87rem;vertical-align:middle;}
   
   /* Stats grid */
   .stat-grid{grid-template-columns:1fr 1fr;}
-  .stat-card{padding:1rem;}
-  .stat-val{font-size:1.6rem;}
+  .stat-card{padding:0.85rem;gap:0.7rem;}
+  .stat-val{font-size:1.5rem;}
+  .stat-ico{width:36px;height:36px;font-size:1rem;}
+  .stat-lbl{font-size:0.65rem;}
   
   /* Tables — horizontal scroll */
   .panel-card{border-radius:4px;}
@@ -345,6 +346,32 @@ td{padding:0.75rem 1rem;font-size:0.87rem;vertical-align:middle;}
 .cred-copy code{font-family:monospace;font-size:0.95rem;color:var(--white);flex:1;}
 .dot-active{display:inline-block;width:7px;height:7px;background:#20c864;border-radius:50%;margin-right:5px;vertical-align:middle;}
 .dot-inactive{display:inline-block;width:7px;height:7px;background:var(--gray-2);border-radius:50%;margin-right:5px;vertical-align:middle;}
+
+/* ── EXTRA MOBILE COMPACT ── */
+@media(max-width:768px){
+  html{font-size:14px;}
+  .topbar{padding:0.6rem 0.8rem;}
+  .topbar-title{font-size:1.1rem;}
+  .content{padding:0.75rem;}
+  .stat-grid{margin-bottom:1rem;}
+  .panel-card{margin-bottom:1rem;}
+  .panel-card-header{padding:0.7rem 0.85rem;}
+  .panel-card-body{padding:0.75rem;}
+  /* Compact table text */
+  table{font-size:0.75rem;}
+  th,td{padding:0.5rem 0.6rem!important;}
+  /* Form two-column on mobile */
+  .form-row{grid-template-columns:1fr 1fr;gap:0.6rem;}
+  .form-row.three{grid-template-columns:1fr 1fr;}
+  .field{margin-bottom:0.6rem;}
+  .field label{font-size:0.62rem;}
+  .field input,.field select,.field textarea{padding:0.55rem 0.75rem;font-size:0.82rem;}
+  /* Member detail compact */
+  .info-grid{grid-template-columns:1fr 1fr;gap:0.6rem;}
+  .info-box{padding:0.7rem;}
+  .info-box-label{font-size:0.58rem;}
+  .info-box-val{font-size:0.88rem;}
+}
 </style>
 </head>
 <body>
