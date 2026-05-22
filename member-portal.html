@@ -186,20 +186,34 @@ body{background:var(--black);color:var(--white);font-family:var(--font-b);min-he
 
 /* ════════════ RESPONSIVE ════════════ */
 @media(max-width:768px){
-  .stats-row{grid-template-columns:1fr 1fr;}
-  .macro-row{grid-template-columns:1fr 1fr;}
-  .hero-card{flex-direction:column;text-align:center;gap:1rem;}
+  .stats-row{grid-template-columns:1fr 1fr;gap:0.6rem;}
+  .macro-row{grid-template-columns:1fr 1fr;gap:0.6rem;}
+  .hero-card{flex-direction:column;text-align:center;gap:0.75rem;}
   .hero-av{align-self:center;}
   .hero-badges{justify-content:center;}
-  .portal-nav{padding:0 1rem;}
-  .portal-body{padding:1rem;padding-bottom:calc(var(--bot-h) + 8px);}
+  .portal-nav{padding:0 0.75rem;}
+  .portal-body{padding:0.75rem;padding-bottom:calc(var(--bot-h) + 8px);}
   #main-grid{grid-template-columns:1fr!important;}
   .week-grid{grid-template-columns:repeat(4,1fr);}
   .member-chip .member-name{display:none;}
+  /* Compact stat boxes */
+  .stat-box{padding:0.7rem 0.8rem;}
+  .stat-box .stat-val{font-size:1.3rem;}
+  .stat-box .stat-lbl{font-size:0.6rem;}
+  /* Compact cards */
+  .card{padding:0.85rem;}
+  .card-title{font-size:0.75rem;}
+  /* Compact workout list items */
+  .ex-row{padding:0.6rem 0.8rem;}
+  /* Compact fee items */
+  .fee-row{padding:0.6rem 0.8rem;}
+  html{font-size:14px;}
 }
 @media(max-width:420px){
   .week-grid{grid-template-columns:repeat(2,1fr);}
-  .hero-info h1{font-size:1.5rem;}
+  .hero-info h1{font-size:1.4rem;}
+  .stats-row{gap:0.4rem;}
+  .portal-body{padding:0.5rem;padding-bottom:calc(var(--bot-h) + 6px);}
 }
 </style>
 </head>
